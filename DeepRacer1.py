@@ -40,7 +40,7 @@ def reward_function(params):
     If we're dipping one, two, or three wheels off the track we can ever so slightly reward that to incentivize cutting corners. This, combined with a minimum steps algorithm should slowly instruct the car to find a true racing line.
     '''
     if not on_track:
-        reward = reward * 1.01
+        reward = reward * 1.03
     
     # Calculate 3 markers that are at varying distances away from the center line
     marker_near = 0.15 * track_width
@@ -52,11 +52,14 @@ def reward_function(params):
         if distance_from_center <= marker_near:
             if steeringAbs <= 8:
                 reward = reward * 1.5
-            elif steeringAbs <= 15:
-                reward = reward
+                if speed == maxSpeed:
+                    # Reward going very fast if we're near the middle and have a low steering angle.
+                    reward = reward * 1.15
+            elif steeringAbs <= 15 and speed > 4:
+                reward = reward * 1.15
             else:
                 # Don't knock this too much. We want to be near the middle sometimes while turning.
-                reward = reward * 0.85
+                reward = reward * 0.90
         # If we're sort of far from the center we should try to be turning back towards it.
         elif distance_from_center <= marker_med:
             if steeringAngle < 0:
@@ -81,10 +84,14 @@ def reward_function(params):
         if distance_from_center <= marker_near:
             if steeringAbs <= 8:
                 reward = reward * 1.5
-            elif steeringAbs <= 15:
-                reward = reward
+                if speed == maxSpeed:
+                    # Reward going very fast if we're near the middle and have a low steering angle.
+                    reward = reward * 1.15
+            elif steeringAbs <= 15 and speed > 4:
+                reward = reward * 1.15
             else:
-                reward = reward * 0.50
+                # Don't knock this too much. We want to be near the middle sometimes while turning.
+                reward = reward * 0.90
         # If we're sort of far from the center we should try to be turning back towards it.
         elif distance_from_center <= marker_med:
             if steeringAngle > 0:
